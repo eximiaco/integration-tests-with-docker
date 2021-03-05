@@ -2,6 +2,7 @@ using CustomerAPI.Customers;
 using CustomerAPI.Infrastructure;
 using IntegrationTests.Dockable;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -39,6 +40,7 @@ namespace IntegrationTests
 
             // Assert
             Assert.True(actual.IsSuccess);
+            AssertDatabase(command);
         }
 
         /// <summary>
@@ -63,6 +65,15 @@ namespace IntegrationTests
 
             // Assert
             Assert.True(actual.IsSuccess);
+            AssertDatabase(command);
+        }
+
+        private void AssertDatabase(ChangeCustomerNameCommand command)
+        {
+            using var assertContext = this.GetContext();
+            var customer = assertContext.Customers.FirstOrDefault(x => x.Id == command.Id);
+            Assert.NotNull(customer);
+            Assert.Equal(command.Name, customer.Name);
         }
 
         private class LocalFixture
